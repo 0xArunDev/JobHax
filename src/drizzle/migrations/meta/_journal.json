@@ -29,6 +29,20 @@
       "when": 1786034342171,
       "tag": "0003_gray_star_brand",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1790855600000,
+      "tag": "0004_add_applicants_metadata",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1760000000000,
+      "tag": "0005_add_saved_jobs",
+      "breakpoints": true
     }
   ]
 }

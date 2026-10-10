@@ -7,20 +7,46 @@ import { Stats } from "@/components/stats"
 import { Testimonials } from "@/components/testimonials"
 import { CTASection } from "@/components/cta-section"
 import { getCurrentUser } from "@/features/auth/server/auth.queries"
+import { getPublicJobs } from "@/features/public-features/jobs.queries"
 
 export default async function HomePage() {
-  const user = await getCurrentUser();
-  console.log(user);
+  const user = await getCurrentUser()
+
+  const heroUser = user ? { name: user.name, role: user.role } : null
+  const role = user?.role ?? null
+
+  // Section visibility by role
+  const isGuest = !user
+  const showStats = isGuest || role === "employer" || role === "admin"
+  const showFeatured = isGuest || role === "applicant" || role === "admin"
+  const showMarketing = isGuest // How It Works + Testimonials are for visitors
+
+  const jobs = showFeatured ? await getPublicJobs() : []
+  const featuredJobs = jobs
+    .slice()
+    .sort((a, b) => Number(b.isFeatured ?? false) - Number(a.isFeatured ?? false))
+    .slice(0, 6)
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="flex-1">
-        <HeroSection />
-        <Stats />
-        <FeaturedJobs />
-        <HowItWorks />
-        <Testimonials />
-        <CTASection />
+        <HeroSection user={heroUser} />
+        {showStats && <Stats />}
+        {showFeatured && (
+          <FeaturedJobs
+            jobs={featuredJobs}
+            isAuthenticated={!!user}
+            isApplicant={role === "applicant"}
+          />
+        )}
+        {showMarketing && (
+          <>
+            <HowItWorks />
+            <Testimonials />
+          </>
+        )}
+        <CTASection user={heroUser} />
       </main>
       <Footer />
     </div>

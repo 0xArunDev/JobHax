@@ -1,5 +1,3 @@
-"use client"
-
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -11,8 +9,6 @@ import {
   Clock, 
   DollarSign, 
   Building2, 
-  Bookmark,
-  Share2,
   Calendar,
   Users,
   Briefcase,
@@ -21,86 +17,23 @@ import {
   ArrowLeft
 } from "lucide-react"
 import Link from "next/link"
+import { getPublicJobById } from "@/features/public-features/jobs.queries"
+import { notFound } from "next/navigation"
+import { getCurrentUser } from "@/features/auth/server/auth.queries"
+import { JobActions, ApplyButton } from "@/components/job-actions"
+import { formatDistanceToNow } from "date-fns"
 
-const jobData = {
-  id: 1,
-  title: "Senior Frontend Developer",
-  company: "TechCorp Inc.",
-  location: "San Francisco, CA",
-  type: "Full-time",
-  salary: "$120,000 - $180,000",
-  tags: ["React", "TypeScript", "Next.js", "Tailwind CSS", "GraphQL"],
-  posted: "2 days ago",
-  deadline: "March 30, 2026",
-  logo: "T",
-  featured: true,
-  description: `We're looking for a Senior Frontend Developer to join our growing team and help build the next generation of our product. You'll work closely with designers, product managers, and backend engineers to deliver exceptional user experiences.
+export default async function JobDetailsPage({ params }: { params: { id: string } }) {
+  const jobId = parseInt(params.id, 10);
+  if (isNaN(jobId)) notFound();
 
-As a Senior Frontend Developer, you'll take ownership of our frontend architecture and help mentor junior developers. This is an opportunity to make a significant impact on a product used by millions of users worldwide.`,
-  responsibilities: [
-    "Lead the development of new features and improvements to our web application",
-    "Write clean, maintainable, and well-tested code",
-    "Collaborate with designers to implement pixel-perfect UI components",
-    "Mentor junior developers and conduct code reviews",
-    "Contribute to architectural decisions and technical strategy",
-    "Optimize application performance and ensure accessibility",
-    "Participate in agile ceremonies and contribute to sprint planning",
-  ],
-  requirements: [
-    "5+ years of experience in frontend development",
-    "Strong proficiency in React and TypeScript",
-    "Experience with Next.js and server-side rendering",
-    "Familiarity with modern CSS frameworks (Tailwind CSS preferred)",
-    "Experience with GraphQL and REST APIs",
-    "Strong understanding of web performance optimization",
-    "Excellent communication and collaboration skills",
-  ],
-  benefits: [
-    "Competitive salary and equity package",
-    "Health, dental, and vision insurance",
-    "Flexible work arrangements (remote-friendly)",
-    "Unlimited PTO policy",
-    "Professional development budget",
-    "Home office setup allowance",
-    "401(k) with company matching",
-  ],
-  companyInfo: {
-    name: "TechCorp Inc.",
-    size: "500-1000 employees",
-    industry: "Technology",
-    founded: "2015",
-    description: "TechCorp Inc. is a leading technology company focused on building innovative solutions that help businesses scale. Our platform is used by over 10,000 companies worldwide.",
-  },
-}
+  const jobData = await getPublicJobById(jobId);
+  if (!jobData) notFound();
 
-const similarJobs = [
-  {
-    id: 2,
-    title: "Frontend Engineer",
-    company: "StartupXYZ",
-    location: "Remote",
-    salary: "$100k - $140k",
-    logo: "S",
-  },
-  {
-    id: 3,
-    title: "React Developer",
-    company: "WebAgency",
-    location: "New York, NY",
-    salary: "$90k - $120k",
-    logo: "W",
-  },
-  {
-    id: 4,
-    title: "UI Developer",
-    company: "DesignTech",
-    location: "Austin, TX",
-    salary: "$95k - $130k",
-    logo: "D",
-  },
-]
+  const user = await getCurrentUser();
+  const isAuthenticated = !!user;
+  const isApplicant = user?.role === "applicant";
 
-export default function JobDetailsPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -125,8 +58,8 @@ export default function JobDetailsPage() {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-secondary text-2xl font-bold text-secondary-foreground">
-                      {jobData.logo}
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-secondary text-2xl font-bold text-secondary-foreground uppercase">
+                      {jobData.employerName?.charAt(0) || "C"}
                     </div>
                     
                     <div className="flex-1">
@@ -136,26 +69,20 @@ export default function JobDetailsPage() {
                             <h1 className="text-2xl font-bold text-foreground">
                               {jobData.title}
                             </h1>
-                            {jobData.featured && (
-                              <Badge variant="secondary" className="bg-primary/10 text-primary">
-                                Featured
-                              </Badge>
-                            )}
                           </div>
                           <div className="mt-2 flex items-center gap-1 text-muted-foreground">
                             <Building2 className="h-4 w-4" />
-                            <span className="font-medium">{jobData.company}</span>
+                            <span className="font-medium">{jobData.employerName}</span>
                           </div>
                         </div>
                         
-                        <div className="flex gap-2 shrink-0">
-                          <Button variant="outline" size="icon">
-                            <Bookmark className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="icon">
-                            <Share2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        <JobActions 
+                            jobId={jobId} 
+                            jobTitle={jobData.title}
+                            employerName={jobData.employerName || "Employer"}
+                            isAuthenticated={isAuthenticated} 
+                            isApplicant={isApplicant} 
+                        />
                       </div>
 
                       <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -163,19 +90,23 @@ export default function JobDetailsPage() {
                           <MapPin className="h-4 w-4" />
                           {jobData.location}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <DollarSign className="h-4 w-4" />
-                          {jobData.salary}
-                        </span>
-                        <Badge variant="outline">{jobData.type}</Badge>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          Posted {jobData.posted}
-                        </span>
+                        {jobData.salaryMin && jobData.salaryMax && (
+                            <span className="flex items-center gap-1">
+                            <DollarSign className="h-4 w-4" />
+                            ${jobData.salaryMin.toLocaleString()} - ${jobData.salaryMax.toLocaleString()}
+                            </span>
+                        )}
+                        <Badge variant="outline" className="capitalize">{jobData.employmentType}</Badge>
+                        {jobData.createdAt && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            Posted {formatDistanceToNow(jobData.createdAt)} ago
+                          </span>
+                        )}
                       </div>
 
                       <div className="mt-4 flex flex-wrap gap-2">
-                        {jobData.tags.map((tag) => (
+                        {(jobData.skills || []).map((tag: string) => (
                           <Badge key={tag} variant="secondary">
                             {tag}
                           </Badge>
@@ -198,58 +129,6 @@ export default function JobDetailsPage() {
                 </CardContent>
               </Card>
 
-              {/* Responsibilities */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Responsibilities</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {jobData.responsibilities.map((item, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-
-              {/* Requirements */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Requirements</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {jobData.requirements.map((item, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-
-              {/* Benefits */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Benefits & Perks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {jobData.benefits.map((item, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10">
-                          <CheckCircle className="h-4 w-4 text-accent" />
-                        </div>
-                        <span className="text-sm text-muted-foreground">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
             {/* Sidebar */}
@@ -258,39 +137,41 @@ export default function JobDetailsPage() {
               <Card className="sticky top-24">
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    <Button className="w-full" size="lg" asChild>
-                      <Link href="/login">Apply for this Job</Link>
-                    </Button>
-                    <p className="text-xs text-center text-muted-foreground">
-                      You need to <Link href="/login" className="text-primary hover:underline">sign in</Link> or{" "}
-                      <Link href="/register" className="text-primary hover:underline">create an account</Link> to apply
-                    </p>
+                    <ApplyButton 
+                        jobId={jobId} 
+                        jobTitle={jobData.title}
+                        employerName={jobData.employerName || "Employer"}
+                        isAuthenticated={isAuthenticated}
+                        isApplicant={isApplicant}
+                    />
                   </div>
 
                   <Separator className="my-6" />
 
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <Calendar className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">Application Deadline</p>
-                        <p className="text-sm text-muted-foreground">{jobData.deadline}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
                       <Briefcase className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="text-sm font-medium">Job Type</p>
-                        <p className="text-sm text-muted-foreground">{jobData.type}</p>
+                        <p className="text-sm text-muted-foreground capitalize">{jobData.employmentType}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <GraduationCap className="h-5 w-5 text-muted-foreground" />
+                      <MapPin className="h-5 w-5 text-muted-foreground" />
                       <div>
-                        <p className="text-sm font-medium">Experience</p>
-                        <p className="text-sm text-muted-foreground">5+ years</p>
+                        <p className="text-sm font-medium">Workplace</p>
+                        <p className="text-sm text-muted-foreground capitalize">{jobData.workplaceType}</p>
                       </div>
                     </div>
+                    {jobData.department && (
+                        <div className="flex items-center gap-3">
+                        <Users className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                            <p className="text-sm font-medium">Department</p>
+                            <p className="text-sm text-muted-foreground capitalize">{jobData.department}</p>
+                        </div>
+                        </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -302,60 +183,36 @@ export default function JobDetailsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-lg font-bold">
-                      {jobData.logo}
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-lg font-bold uppercase">
+                      {jobData.employerName?.charAt(0) || "C"}
                     </div>
                     <div>
-                      <p className="font-semibold">{jobData.companyInfo.name}</p>
-                      <p className="text-sm text-muted-foreground">{jobData.companyInfo.industry}</p>
+                      <p className="font-semibold">{jobData.employerName}</p>
+                      {jobData.employerLocation && <p className="text-sm text-muted-foreground">{jobData.employerLocation}</p>}
                     </div>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {jobData.companyInfo.description}
-                  </p>
+                  {jobData.employerMetadata && (jobData.employerMetadata as any).description && (
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {(jobData.employerMetadata as any).description}
+                      </p>
+                  )}
 
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">{jobData.companyInfo.size}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Founded {jobData.companyInfo.founded}</span>
-                    </div>
+                    {jobData.employerMetadata && (jobData.employerMetadata as any).companySize && (
+                        <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">{(jobData.employerMetadata as any).companySize} employees</span>
+                        </div>
+                    )}
+                    {jobData.employerMetadata && (jobData.employerMetadata as any).websiteUrl && (
+                        <div className="flex items-center gap-2 mt-4">
+                        <Button variant="outline" className="w-full" asChild>
+                            <a href={(jobData.employerMetadata as any).websiteUrl} target="_blank" rel="noopener noreferrer">Visit Website</a>
+                        </Button>
+                        </div>
+                    )}
                   </div>
-
-                  <Button variant="outline" className="w-full mt-4">
-                    View Company Profile
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Similar Jobs */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Similar Jobs</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {similarJobs.map((job) => (
-                    <Link 
-                      key={job.id}
-                      href={`/jobs/${job.id}`}
-                      className="block p-3 rounded-lg border border-border hover:border-primary/50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-sm font-bold">
-                          {job.logo}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm truncate">{job.title}</p>
-                          <p className="text-xs text-muted-foreground">{job.company}</p>
-                          <p className="text-xs text-muted-foreground">{job.salary}</p>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
                 </CardContent>
               </Card>
             </div>
