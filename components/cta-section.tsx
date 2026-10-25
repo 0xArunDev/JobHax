@@ -65,7 +65,7 @@ export function CTASection({ user = null }: CTASectionProps) {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" asChild>
+            <Button size="lg" variant="secondary" asChild>
               <Link href="/candidate/applications" className="gap-2">
                 <FileText className="h-4 w-4" />
                 My Applications

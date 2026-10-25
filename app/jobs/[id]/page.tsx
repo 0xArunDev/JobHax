@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { 
-  MapPin, 
-  Clock, 
-  DollarSign, 
-  Building2, 
+import {
+  MapPin,
+  Clock,
+  DollarSign,
+  Building2,
   Calendar,
   Users,
   Briefcase,
@@ -23,8 +23,9 @@ import { getCurrentUser } from "@/features/auth/server/auth.queries"
 import { JobActions, ApplyButton } from "@/components/job-actions"
 import { formatDistanceToNow } from "date-fns"
 
-export default async function JobDetailsPage({ params }: { params: { id: string } }) {
-  const jobId = parseInt(params.id, 10);
+export default async function JobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const jobId = parseInt(id, 10);
   if (isNaN(jobId)) notFound();
 
   const jobData = await getPublicJobById(jobId);
@@ -61,7 +62,7 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
                     <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-secondary text-2xl font-bold text-secondary-foreground uppercase">
                       {jobData.employerName?.charAt(0) || "C"}
                     </div>
-                    
+
                     <div className="flex-1">
                       <div className="flex items-start justify-between gap-4">
                         <div>
@@ -75,13 +76,13 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
                             <span className="font-medium">{jobData.employerName}</span>
                           </div>
                         </div>
-                        
-                        <JobActions 
-                            jobId={jobId} 
-                            jobTitle={jobData.title}
-                            employerName={jobData.employerName || "Employer"}
-                            isAuthenticated={isAuthenticated} 
-                            isApplicant={isApplicant} 
+
+                        <JobActions
+                          jobId={jobId}
+                          jobTitle={jobData.title}
+                          employerName={jobData.employerName || "Employer"}
+                          isAuthenticated={isAuthenticated}
+                          isApplicant={isApplicant}
                         />
                       </div>
 
@@ -91,16 +92,16 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
                           {jobData.location}
                         </span>
                         {jobData.salaryMin && jobData.salaryMax && (
-                            <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1">
                             <DollarSign className="h-4 w-4" />
                             ${jobData.salaryMin.toLocaleString()} - ${jobData.salaryMax.toLocaleString()}
-                            </span>
+                          </span>
                         )}
                         <Badge variant="outline" className="capitalize">{jobData.employmentType}</Badge>
                         {jobData.createdAt && (
                           <span className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
-                            Posted {formatDistanceToNow(jobData.createdAt)} ago
+                            Posted {formatDistanceToNow(new Date(jobData.createdAt))} ago
                           </span>
                         )}
                       </div>
@@ -134,15 +135,15 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Apply Card */}
-              <Card className="sticky top-24">
+              <Card className="top-24">
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    <ApplyButton 
-                        jobId={jobId} 
-                        jobTitle={jobData.title}
-                        employerName={jobData.employerName || "Employer"}
-                        isAuthenticated={isAuthenticated}
-                        isApplicant={isApplicant}
+                    <ApplyButton
+                      jobId={jobId}
+                      jobTitle={jobData.title}
+                      employerName={jobData.employerName || "Employer"}
+                      isAuthenticated={isAuthenticated}
+                      isApplicant={isApplicant}
                     />
                   </div>
 
@@ -164,13 +165,13 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
                       </div>
                     </div>
                     {jobData.department && (
-                        <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3">
                         <Users className="h-5 w-5 text-muted-foreground" />
                         <div>
-                            <p className="text-sm font-medium">Department</p>
-                            <p className="text-sm text-muted-foreground capitalize">{jobData.department}</p>
+                          <p className="text-sm font-medium">Department</p>
+                          <p className="text-sm text-muted-foreground capitalize">{jobData.department}</p>
                         </div>
-                        </div>
+                      </div>
                     )}
                   </div>
                 </CardContent>
@@ -191,26 +192,26 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
                       {jobData.employerLocation && <p className="text-sm text-muted-foreground">{jobData.employerLocation}</p>}
                     </div>
                   </div>
-                  
-                  {jobData.employerMetadata && (jobData.employerMetadata as any).description && (
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {(jobData.employerMetadata as any).description}
-                      </p>
+
+                  {(jobData.employerDescription || (jobData.employerMetadata as any)?.description) && (
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {jobData.employerDescription || (jobData.employerMetadata as any)?.description}
+                    </p>
                   )}
 
                   <div className="space-y-2 text-sm">
-                    {jobData.employerMetadata && (jobData.employerMetadata as any).companySize && (
-                        <div className="flex items-center gap-2">
+                    {(jobData.employerTeamSize || (jobData.employerMetadata as any)?.companySize) && (
+                      <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">{(jobData.employerMetadata as any).companySize} employees</span>
-                        </div>
+                        <span className="text-muted-foreground">{jobData.employerTeamSize || (jobData.employerMetadata as any)?.companySize} employees</span>
+                      </div>
                     )}
-                    {jobData.employerMetadata && (jobData.employerMetadata as any).websiteUrl && (
-                        <div className="flex items-center gap-2 mt-4">
+                    {(jobData.employerWebsiteUrl || (jobData.employerMetadata as any)?.websiteUrl) && (
+                      <div className="flex items-center gap-2 mt-4">
                         <Button variant="outline" className="w-full" asChild>
-                            <a href={(jobData.employerMetadata as any).websiteUrl} target="_blank" rel="noopener noreferrer">Visit Website</a>
+                          <a href={jobData.employerWebsiteUrl || (jobData.employerMetadata as any)?.websiteUrl} target="_blank" rel="noopener noreferrer">Visit Website</a>
                         </Button>
-                        </div>
+                      </div>
                     )}
                   </div>
                 </CardContent>

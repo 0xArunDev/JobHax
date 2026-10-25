@@ -45,6 +45,9 @@ export const getPublicJobById = async (jobId: number) => {
             employerId: employers.id,
             employerName: employers.name,
             employerLocation: employers.location,
+            employerDescription: employers.description,
+            employerWebsiteUrl: employers.websiteUrl,
+            employerTeamSize: employers.teamSize,
             employerMetadata: employers.metadata,
         })
         .from(jobs)

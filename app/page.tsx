@@ -15,11 +15,10 @@ export default async function HomePage() {
   const heroUser = user ? { name: user.name, role: user.role } : null
   const role = user?.role ?? null
 
-  // Section visibility by role
   const isGuest = !user
   const showStats = isGuest || role === "employer" || role === "admin"
   const showFeatured = isGuest || role === "applicant" || role === "admin"
-  const showMarketing = isGuest // How It Works + Testimonials are for visitors
+  const showMarketing = isGuest
 
   const jobs = showFeatured ? await getPublicJobs() : []
   const featuredJobs = jobs
