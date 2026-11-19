@@ -4,6 +4,9 @@
 
 **A modern, AI-ready job portal connecting candidates with top employers.**
 
+🌐 **Live:** [https://job-hax.vercel.app/](https://job-hax.vercel.app/)
+
+[![Website](https://img.shields.io/badge/website-job--hax.vercel.app-000000?logo=vercel&logoColor=white)](https://job-hax.vercel.app/)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
