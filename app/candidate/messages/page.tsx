@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { 
   Search,
@@ -52,7 +51,7 @@ export default function CandidateMessagesPage() {
         if (profileRes.status === "SUCCESS") {
             setUser(profileRes.data);
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to load conversations");
       } finally {
         setLoading(false);
@@ -271,7 +270,6 @@ export default function CandidateMessagesPage() {
                 </div>
                 </>
             ) : (
-                /* Empty State for Desktop */
                 <div className="hidden md:flex flex-1 items-center justify-center">
                   <Card className="max-w-sm">
                     <CardContent className="py-12 text-center border-dashed">

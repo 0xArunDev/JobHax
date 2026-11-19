@@ -28,7 +28,6 @@ import {
   Building2,
   Loader,
   Upload,
-  X,
   Loader2,
   Trash2,
 } from "lucide-react";
@@ -106,9 +105,7 @@ const EmployerForm = ({employer, avatarUrl}: {employer: any, avatarUrl: any}) =>
         },
       },
     };
-    console.log("Form submitted with data:", payload);
-    const result = await updateEmployerProfile(payload);
-    console.log(result.message);
+    await updateEmployerProfile(payload);
   };  
   return (
     <main className="flex-1 overflow-auto">

@@ -36,7 +36,7 @@ export const updateEmployerProfile = async (data: UpdateCompanyProfileData) => {
         }
         await db.update(employers).set(rest).where(eq(employers.id, currentUser.id));
         return { status: "SUCCESS", message: "Company profile updated successfully" };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to update company profile" };
     }
 }
@@ -167,7 +167,7 @@ export const postJob = async (data: PostJobType) => {
 
         await db.insert(jobs).values({ ...validatedData, employerId: currentUser.id });
         return { status: "SUCCESS", message: "Job posted successfully" };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to post a job" };
     }
 }
@@ -186,7 +186,7 @@ export const updateJobStatus = async (jobId: number, status: "draft" | "publishe
 
         await db.update(jobs).set({ status }).where(eq(jobs.id, jobId));
         return { status: "SUCCESS", message: `Job status updated to ${status}` };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to update job status" };
     }
 }
@@ -205,7 +205,7 @@ export const deleteJob = async (jobId: number) => {
 
         await db.delete(jobs).where(eq(jobs.id, jobId));
         return { status: "SUCCESS", message: "Job deleted successfully" };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to delete job" };
     }
 }
@@ -222,6 +222,7 @@ export const duplicateJob = async (jobId: number) => {
             return { status: "ERROR", message: "Job not found" };
         }
 
+        // Exclude id/timestamps from the copy so they aren't re-inserted
         const { id, createdAt, updatedAt, ...rest } = existingJob;
         await db.insert(jobs).values({
             ...rest,
@@ -230,7 +231,7 @@ export const duplicateJob = async (jobId: number) => {
         });
 
         return { status: "SUCCESS", message: "Job duplicated successfully as draft" };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to duplicate job" };
     }
 }
@@ -252,7 +253,7 @@ export const updateJob = async (jobId: number, data: PostJobType) => {
 
         await db.update(jobs).set(validatedData).where(eq(jobs.id, jobId));
         return { status: "SUCCESS", message: "Job updated successfully" };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to update job" };
     }
 }
@@ -261,7 +262,7 @@ export const fetchEmployerJobsAction = async () => {
     try {
         const jobsList = await getEmployerJobs();
         return { status: "SUCCESS", data: jobsList };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to fetch jobs", data: [] };
     }
 }
@@ -275,7 +276,7 @@ export const fetchEmployerCandidatesAction = async () => {
             return { status: "ERROR", message: "Unauthorized or employer not found" };
         }
         return { status: "SUCCESS", data: candidatesData };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to fetch candidates" };
     }
 }
@@ -310,7 +311,7 @@ export const updateCandidateStatusAction = async (
             status: "SUCCESS",
             message: `Updated status for ${app.candidateName} to ${status.charAt(0).toUpperCase() + status.slice(1)}`
         };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to update candidate status" };
     }
 }
@@ -347,7 +348,7 @@ export const toggleCandidateStarredAction = async (applicationId: number) => {
             isStarred: nextStarred,
             message: nextStarred ? `Shortlisted ${app.candidateName}` : `Removed star for ${app.candidateName}`
         };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to update shortlist status" };
     }
 }
@@ -390,7 +391,7 @@ export const scheduleInterviewAction = async (
             status: "SUCCESS",
             message: `Interview scheduled with ${app.candidateName}`
         };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to schedule interview" };
     }
 }
@@ -421,7 +422,7 @@ export const updateCandidateNotesAction = async (
             .where(eq(jobApplications.id, applicationId));
 
         return { status: "SUCCESS", message: "Candidate notes saved" };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to save notes" };
     }
 }
@@ -446,7 +447,7 @@ export const deleteCandidateApplicationAction = async (applicationId: number) =>
         await db.delete(jobApplications).where(eq(jobApplications.id, applicationId));
 
         return { status: "SUCCESS", message: `Application for ${app.candidateName} removed` };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to remove candidate application" };
     }
 }
@@ -768,11 +769,7 @@ export const sendEmployerMessage = async (data: SendEmployerMessageData) => {
             return { status: "ERROR", message: "Unauthorized" };
         }
 
-        // Check if conversation exists, if not create it. But conversationId is required in schema?
-        // Let's assume conversationId is passed, or if not, we handle it. The schema employer.schema.ts has sendEmployerMessageSchema.
-        // I'll need to double check the schema. Wait, if it has conversationId we just insert.
-        // If the schema requires conversationId, we insert message and update conversation lastMessageAt.
-        
+        // Insert the message and bump the conversation's read/receipt timestamps
         await db.transaction(async (tx) => {
             await tx.insert(messages).values({
                 conversationId: validatedData.conversationId,
@@ -785,8 +782,6 @@ export const sendEmployerMessage = async (data: SendEmployerMessageData) => {
                 .set({ lastMessageAt: new Date(), employerLastReadAt: new Date() })
                 .where(eq(conversations.id, validatedData.conversationId));
         });
-
-        // revalidatePath("/employer/messages") could be added, but returning success is enough if frontend does optimistic update or revalidation
 
         return { status: "SUCCESS", message: "Message sent successfully" };
     } catch (error) {

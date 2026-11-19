@@ -9,11 +9,8 @@ import {
   Clock,
   DollarSign,
   Building2,
-  Calendar,
   Users,
   Briefcase,
-  GraduationCap,
-  CheckCircle,
   ArrowLeft
 } from "lucide-react"
 import Link from "next/link"

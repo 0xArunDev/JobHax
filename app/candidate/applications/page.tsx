@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
   Search,
   Building2,
@@ -61,7 +61,7 @@ export default function CandidateApplicationsPage() {
         if (profileRes.status === "SUCCESS") {
             setUser(profileRes.data);
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to load applications");
       } finally {
         setLoading(false);

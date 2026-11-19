@@ -129,7 +129,6 @@ export default function EmployerJobsPage() {
   // Delete Job Dialog state
   const [deletingJobId, setDeletingJobId] = useState<number | null>(null)
 
-  // Load jobs directly from DB (only employer created jobs)
   const loadJobs = async () => {
     setLoading(true)
     try {
@@ -146,7 +145,7 @@ export default function EmployerJobsPage() {
       } else {
         setJobsList([])
       }
-    } catch (err) {
+    } catch {
       setJobsList([])
     } finally {
       setLoading(false)
@@ -208,7 +207,6 @@ export default function EmployerJobsPage() {
     })
   }
 
-  // Edit Job Modal Open
   const openEditModal = (job: JobItem) => {
     setEditingJob(job)
     setEditForm({
@@ -313,7 +311,6 @@ export default function EmployerJobsPage() {
     return 0
   })
 
-  // Summary counts
   const totalJobsCount = jobsList.length
   const activeCount = jobsList.filter(j => j.status === "published").length
   const pausedCount = jobsList.filter(j => j.status === "paused").length

@@ -56,19 +56,6 @@ export function JobActions({
         });
     }
 
-    const handleApplyClick = () => {
-        if (!isAuthenticated) {
-            toast.error("Please login to apply");
-            window.location.href = "/login";
-            return;
-        }
-        if (!isApplicant) {
-            toast.error("Only applicants can apply to jobs");
-            return;
-        }
-        setIsApplyDialogOpen(true);
-    }
-
     return (
         <>
             <div className="flex gap-2 shrink-0">

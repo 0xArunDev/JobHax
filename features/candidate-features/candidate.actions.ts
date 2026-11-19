@@ -26,9 +26,8 @@ import {
     savedJobs,
     conversations,
     messages,
-    employers,
 } from "@/src/drizzle/schema";
-import { eq, and, ne, or, desc } from "drizzle-orm";
+import { eq, and, ne, or } from "drizzle-orm";
 import argon2 from "argon2";
 import {
     getCurrentApplicantDetails,
@@ -360,7 +359,7 @@ export const withdrawApplication = async (applicationId: number) => {
         await db.delete(jobApplications).where(eq(jobApplications.id, applicationId));
 
         return { status: "SUCCESS", message: "Application withdrawn successfully" };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to withdraw application" };
     }
 };
@@ -408,7 +407,7 @@ export const saveJob = async (jobId: number) => {
         });
 
         return { status: "SUCCESS", message: "Job saved!" };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to save job" };
     }
 };
@@ -447,7 +446,7 @@ export const unsaveJob = async (jobId: number) => {
             );
 
         return { status: "SUCCESS", message: "Job removed from saved list" };
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to unsave job" };
     }
 };
@@ -489,7 +488,7 @@ export const toggleSaveJob = async (jobId: number) => {
             });
             return { status: "SUCCESS", isSaved: true, message: "Job saved!" };
         }
-    } catch (error) {
+    } catch {
         return { status: "ERROR", message: "Failed to toggle saved job" };
     }
 };

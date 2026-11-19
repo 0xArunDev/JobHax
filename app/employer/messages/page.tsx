@@ -15,11 +15,9 @@ export default async function EmployerMessagesPage() {
     redirect("/login")
   }
 
-  // We fetch conversations here, since it's a server component.
+  // Fetch on the server so the client starts with data
   const conversations = await getEmployerConversations()
 
-  // We need to fetch details so we can pass to client
-  // Get full current user to pass down
   return (
     <EmployerMessagesClient 
       initialConversations={conversations} 

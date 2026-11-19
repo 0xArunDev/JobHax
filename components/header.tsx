@@ -37,6 +37,65 @@ type UserInfo = {
   avatarUrl?: string | null
 } | null
 
+const NavLinks = ({
+  isCandidate,
+  isEmployer,
+  onClose,
+}: {
+  isCandidate: boolean
+  isEmployer: boolean
+  onClose: () => void
+}) => (
+  <>
+    <Link
+      href="/"
+      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      onClick={onClose}
+    >
+      Home
+    </Link>
+    <Link
+      href="/jobs"
+      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      onClick={onClose}
+    >
+      Browse Jobs
+    </Link>
+    <Link
+      href="/about"
+      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      onClick={onClose}
+    >
+      About
+    </Link>
+    <Link
+      href="/contact"
+      className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      onClick={onClose}
+    >
+      Contact
+    </Link>
+    {isCandidate && (
+      <Link
+        href="/candidate/applications"
+        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        onClick={onClose}
+      >
+        My Applications
+      </Link>
+    )}
+    {isEmployer && (
+      <Link
+        href="/employer/post-job"
+        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        onClick={onClose}
+      >
+        Post a Job
+      </Link>
+    )}
+  </>
+)
+
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<UserInfo>(null)
@@ -57,57 +116,6 @@ export function Header() {
   const isCandidate = user?.role === "applicant"
   const isEmployer = user?.role === "employer"
 
-  const NavLinks = () => (
-    <>
-      <Link
-        href="/"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        onClick={() => setIsOpen(false)}
-      >
-        Home
-      </Link>
-      <Link
-        href="/jobs"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        onClick={() => setIsOpen(false)}
-      >
-        Browse Jobs
-      </Link>
-      <Link
-        href="/about"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        onClick={() => setIsOpen(false)}
-      >
-        About
-      </Link>
-      <Link
-        href="/contact"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        onClick={() => setIsOpen(false)}
-      >
-        Contact
-      </Link>
-      {isCandidate && (
-        <Link
-          href="/candidate/applications"
-          className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          onClick={() => setIsOpen(false)}
-        >
-          My Applications
-        </Link>
-      )}
-      {isEmployer && (
-        <Link
-          href="/employer/post-job"
-          className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          onClick={() => setIsOpen(false)}
-        >
-          Post a Job
-        </Link>
-      )}
-    </>
-  )
-
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -121,7 +129,11 @@ export function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          <NavLinks />
+          <NavLinks
+            isCandidate={isCandidate}
+            isEmployer={isEmployer}
+            onClose={() => setIsOpen(false)}
+          />
         </nav>
 
         {/* Desktop Auth Area */}
@@ -264,7 +276,11 @@ export function Header() {
               )}
 
               <nav className="flex flex-col gap-4">
-                <NavLinks />
+                <NavLinks
+                  isCandidate={isCandidate}
+                  isEmployer={isEmployer}
+                  onClose={() => setIsOpen(false)}
+                />
                 {user && (
                   <>
                     <div className="border-t border-border pt-4">

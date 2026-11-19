@@ -53,7 +53,7 @@ export const createSessionAndSetCookies = async (
   const ip = await getIPAddress();
   const headersList = await headers();
 
-  const session = await createUserSession({
+  await createUserSession({
     token,
     userId: userId,
     userAgent: headersList.get("user-agent") || "",
@@ -68,7 +68,6 @@ export const createSessionAndSetCookies = async (
     httpOnly: true,
     maxAge: SESSION_LIFETIME,
   });
-  console.log(session);
 };
 
 export const validateSessionAndGetUser = async (session: string) => {

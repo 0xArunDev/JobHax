@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { int, mysqlTable, text, varchar, timestamp, mysqlEnum, date, year, json, serial, boolean, uniqueIndex, index } from 'drizzle-orm/mysql-core';
+import { int, mysqlTable, text, varchar, timestamp, mysqlEnum, date, year, json, boolean, uniqueIndex, index } from 'drizzle-orm/mysql-core';
 
 export type EmployerNotificationPreferences = {
     newApplications?: boolean;
@@ -126,24 +126,22 @@ export const applicants = mysqlTable("applicants", {
     createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });
-// Relations definitions
+
 export const usersRelations = relations(users, ({ one, many }) => ({
-    // One user can have one employer profile (if role is employer)
     employer: one(employers, {
         fields: [users.id],
         references: [employers.id],
     }),
-    // One user can have one applicant profile (if role is applicant)
+
     applicant: one(applicants, {
         fields: [users.id],
         references: [applicants.id],
     }),
-    // One user can have many sessions
+
     sessions: many(sessions),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
-    // Each session belongs to one user
     user: one(users, {
         fields: [sessions.userId],
         references: [users.id],

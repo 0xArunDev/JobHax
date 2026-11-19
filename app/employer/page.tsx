@@ -2,11 +2,10 @@ import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Briefcase,
   Users,
-  Eye,
   TrendingUp,
   MapPin,
   Clock,
@@ -34,8 +33,7 @@ export default async function EmployerDashboard() {
 
   const analytics = analyticsRes.status === "SUCCESS" ? analyticsRes.data : null;
   const recentApplicants = candidatesData?.candidates?.slice(0, 5) || [];
-  
-  // Format stats using real data
+
   const stats = [
     {
       label: "Active Jobs",
@@ -99,7 +97,7 @@ export default async function EmployerDashboard() {
                       Incomplete Profile
                     </ItemTitle>
                     <ItemDescription className="text-white/80 text-[.8rem]">
-                      You haven't completed your employer profile yet. Please
+                      You haven&apos;t completed your employer profile yet. Please
                       complete your profile to post jobs and access all
                       features.
                     </ItemDescription>

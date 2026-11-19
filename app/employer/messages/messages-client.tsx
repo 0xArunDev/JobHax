@@ -41,6 +41,22 @@ export function EmployerMessagesClient({
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  const loadMessages = async (conversationId: number) => {
+    setIsLoadingMessages(true)
+    try {
+      const response = await getConversationMessagesAction(conversationId)
+      if (response.status === "SUCCESS") {
+        setMessages(response.data)
+      } else {
+        toast.error(response.message || "Failed to load messages")
+      }
+    } catch {
+      toast.error("An error occurred while loading messages")
+    } finally {
+      setIsLoadingMessages(false)
+    }
+  }
+
   useEffect(() => {
     if (selectedConversation) {
       loadMessages(selectedConversation.id)
@@ -52,22 +68,6 @@ export function EmployerMessagesClient({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
   }, [messages])
-
-  const loadMessages = async (conversationId: number) => {
-    setIsLoadingMessages(true)
-    try {
-      const response = await getConversationMessagesAction(conversationId)
-      if (response.status === "SUCCESS") {
-        setMessages(response.data)
-      } else {
-        toast.error(response.message || "Failed to load messages")
-      }
-    } catch (error) {
-      toast.error("An error occurred while loading messages")
-    } finally {
-      setIsLoadingMessages(false)
-    }
-  }
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation) return
@@ -103,9 +103,8 @@ export function EmployerMessagesClient({
 
     if (res.status === "ERROR") {
       toast.error(res.message)
-      // Rollback optimistic update could go here
     } else {
-      // Reload messages to get true IDs if needed
+      // Reload so messages carry their real IDs from the server
       loadMessages(selectedConversation.id)
     }
   }

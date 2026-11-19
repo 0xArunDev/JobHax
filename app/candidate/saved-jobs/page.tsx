@@ -45,7 +45,7 @@ export default function SavedJobsPage() {
         if (profileRes.status === "SUCCESS") {
             setUser(profileRes.data);
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to load saved jobs");
       } finally {
         setLoading(false);

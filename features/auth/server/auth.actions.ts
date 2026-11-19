@@ -61,7 +61,7 @@ export const registerUserAction = async (data: RegisterUserData) => {
             status: "SUCCESS",
             message: "User registered successfully",
         };
-    } catch (error) {
+    } catch {
         return {
             status: "ERROR",
             message: "Something went wrong",
@@ -97,7 +97,7 @@ export const loginUserAction = async (data: LoginUserData) => {
             message: "User logged in successfully",
         };
     } catch (error: any) {
-        console.log(error);
+        console.error(error);
         return {
             status: "ERROR",
             message: error.message,

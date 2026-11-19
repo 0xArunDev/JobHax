@@ -50,7 +50,7 @@ export default function CandidateSettingsPage() {
           setNotifications(res.data.notifications);
           setPrivacy(res.data.privacy);
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to load settings");
       } finally {
         setLoading(false);

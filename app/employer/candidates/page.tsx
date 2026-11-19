@@ -40,7 +40,6 @@ import {
   Briefcase,
   MoreVertical,
   Mail,
-  Phone,
   FileText,
   Star,
   CheckCircle,
@@ -52,10 +51,7 @@ import {
   Sparkles,
   RefreshCw,
   UserCheck,
-  UserX,
-  Filter,
   ArrowUpDown,
-  PlusCircle,
   Loader2,
   Trash2,
 } from "lucide-react";
@@ -76,7 +72,7 @@ import {
   CandidateItemForSchedule,
 } from "@/components/schedule-interview-dialog";
 
-export interface CandidateItem extends CandidateDetailData {}
+export type CandidateItem = CandidateDetailData;
 
 interface EmployerJobItem {
   id: number;
@@ -148,7 +144,6 @@ export default function EmployerCandidatesPage() {
 
   const [isPending, startTransition] = useTransition();
 
-  // Load candidates data from Server Action
   const loadCandidates = async () => {
     setLoading(true);
     try {
@@ -247,17 +242,6 @@ export default function EmployerCandidatesPage() {
     });
   };
 
-  // Action: Advance to next stage helper
-  const handleAdvanceStage = (candidate: CandidateItem, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    const stages: ApplicationStatus[] = ["new", "screening", "interview", "offered"];
-    const currentIdx = stages.indexOf(candidate.status);
-    if (currentIdx >= 0 && currentIdx < stages.length - 1) {
-      handleStatusChange(candidate.id, stages[currentIdx + 1]);
-    }
-  };
-
-  // Action: Open Schedule Modal
   const handleOpenSchedule = (
     candidate: CandidateItem | CandidateItemForSchedule,
     e?: React.MouseEvent
@@ -275,13 +259,11 @@ export default function EmployerCandidatesPage() {
     setScheduleDialogOpen(true);
   };
 
-  // Action: Open Details Modal
   const handleOpenDetails = (candidate: CandidateItem) => {
     setSelectedCandidateForDetails(candidate);
     setDetailsDialogOpen(true);
   };
 
-  // Callback: Update Candidate in local state from Dialog
   const handleCandidateUpdated = (
     updated: Partial<CandidateItem> & { id: number }
   ) => {
@@ -295,7 +277,6 @@ export default function EmployerCandidatesPage() {
     }
   };
 
-  // Action: Delete Application
   const handleDeleteApplication = async () => {
     if (!deletingApplicationId) return;
     const appId = deletingApplicationId;
@@ -315,7 +296,6 @@ export default function EmployerCandidatesPage() {
     });
   };
 
-  // Action: Seed Demo Candidates
   const handleSeedDemo = async () => {
     startTransition(async () => {
       const targetJobId =
@@ -330,7 +310,6 @@ export default function EmployerCandidatesPage() {
     });
   };
 
-  // Dynamic counts for tabs & overview metrics
   const counts = useMemo(() => {
     return {
       total: candidates.length,
@@ -343,7 +322,6 @@ export default function EmployerCandidatesPage() {
     };
   }, [candidates]);
 
-  // Filtered and Sorted Candidates
   const filteredCandidates = useMemo(() => {
     return candidates
       .filter((candidate) => {

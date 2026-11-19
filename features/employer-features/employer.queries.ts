@@ -1,7 +1,7 @@
 import { db } from "@/src/config/db";
-import { employers, jobs, jobApplications, conversations, messages, ApplicationStatus, users } from "@/src/drizzle/schema";
+import { employers, jobs, jobApplications, conversations, messages, users } from "@/src/drizzle/schema";
 import { getCurrentUser } from "../auth/server/auth.queries";
-import { eq, desc, asc, inArray, and } from "drizzle-orm";
+import { eq, desc, asc } from "drizzle-orm";
 
 export const getCurrentEmployerDetails = async () => {
     const currentUser = await getCurrentUser();
@@ -107,8 +107,6 @@ export const getEmployerCandidatesData = async () => {
             }
         };
     }
-
-    const jobIds = employerJobs.map(j => Number(j.id));
 
     // 2. Fetch all applications for employer's jobs
     const applications = await db

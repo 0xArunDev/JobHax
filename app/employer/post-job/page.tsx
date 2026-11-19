@@ -97,15 +97,10 @@ export default function PostJobPage() {
   };
 
   const onSubmit = async (data: PostJobType) => {
-    console.log("Form submitted with data:", data);
     const result = await postJob(data);
     if (result.status === "SUCCESS") {
       redirect("/employer/jobs");
     }
-  };
-
-  const onError = (errors: any) => {
-    console.log("Validation errors:", errors);
   };
 
   return (
@@ -117,7 +112,7 @@ export default function PostJobPage() {
       />
 
       <main className="flex-1 overflow-auto">
-        <form onSubmit={handleSubmit(onSubmit, onError)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="container mx-auto p-6 lg:p-8 max-w-4xl">
             {/* Header */}
             <div className="mb-8">

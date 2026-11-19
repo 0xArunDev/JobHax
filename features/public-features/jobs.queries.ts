@@ -1,5 +1,5 @@
 import { db } from "@/src/config/db";
-import { jobs, employers, users } from "@/src/drizzle/schema";
+import { jobs, employers } from "@/src/drizzle/schema";
 import { eq, desc } from "drizzle-orm";
 
 export const getPublicJobs = async () => {
