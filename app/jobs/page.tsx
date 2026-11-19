@@ -22,6 +22,10 @@ import { getCurrentUser } from "@/features/auth/server/auth.queries"
 import { JobSaveButton } from "@/components/job-save-button"
 import { formatDistanceToNow } from "date-fns"
 
+// This page queries the database on every request, so it must never be
+// prerendered at build time (the build environment has no database).
+export const dynamic = "force-dynamic"
+
 export default async function JobsPage() {
   const jobs = await getPublicJobs();
   const user = await getCurrentUser();

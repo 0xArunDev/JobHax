@@ -20,6 +20,9 @@ import { getCurrentUser } from "@/features/auth/server/auth.queries"
 import { JobActions, ApplyButton } from "@/components/job-actions"
 import { formatDistanceToNow } from "date-fns"
 
+// Job details are fetched from the database per request — render dynamically.
+export const dynamic = "force-dynamic"
+
 export default async function JobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const jobId = parseInt(id, 10);
